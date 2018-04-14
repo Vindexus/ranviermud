@@ -11,11 +11,20 @@ module.exports = (srcPath) => {
     const perCol = Math.ceil(strings.length / numCols);
     let rowCount = 0;
     const colWidth = Math.floor((3 * 20) / numCols);
+    const extraSpace = (perCol * numCols) - strings.length;
     const columnedStrings = strings.reduce((map, string, index) => {
       if (rowCount >= perCol) {
         rowCount = 0;
         col++;
       }
+
+      const longCol = numCols - col > extraSpace;
+
+      if (!longCol && rowCount + 1 >= perCol) {
+        rowCount = 0;
+        col++;
+      }
+
       map[col] = map[col] || [];
 
       if (!map[col]) {
