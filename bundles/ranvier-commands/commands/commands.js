@@ -79,7 +79,7 @@ module.exports = (srcPath) => {
       }
 
       commands.sort()
-      sayAtColumns(player, commands, 4)
+      sayAtColumns(player, commands, 3)
 
       // channels
       Broadcast.sayAt(player);
@@ -93,7 +93,7 @@ module.exports = (srcPath) => {
       }
 
       channelCommands.sort();
-      sayAtColumns(player, channelCommands, 4)
+      sayAtColumns(player, channelCommands, 3)
 
 
       // end with a line break
