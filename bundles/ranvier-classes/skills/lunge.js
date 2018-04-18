@@ -1,13 +1,12 @@
 'use strict';
 
-const Combat = require('../../ranvier-combat/lib/Combat');
-
 /**
  * Basic warrior attack
  */
-module.exports = (srcPath) => {
+module.exports = (srcPath, app) => {
+  const Combat = app.Combat;
   const Broadcast = require(srcPath + 'Broadcast');
-  const Damage = require(srcPath + 'Damage');
+  const Damage = app.Damage;
   const SkillType = require(srcPath + 'SkillType');
 
   const damagePercent = 250;

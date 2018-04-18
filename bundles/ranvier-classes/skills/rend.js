@@ -1,11 +1,10 @@
 'use strict';
 
-const Combat = require('../../ranvier-combat/lib/Combat');
-
 /**
  * DoT (Damage over time) skill
  */
-module.exports = (srcPath) => {
+module.exports = (srcPath, app) => {
+  const Combat = app.Combat;
   const Broadcast = require(srcPath + 'Broadcast');
   const SkillType = require(srcPath + 'SkillType');
 

@@ -1,8 +1,8 @@
 'use strict';
 
-module.exports = srcPath => {
+module.exports = (srcPath, app) => {
   const Broadcast = require(srcPath + 'Broadcast');
-  const Damage = require(srcPath + 'Damage');
+  const Damage = app.Damage;
   const Heal = require(srcPath + 'Heal');
   const Flag = require(srcPath + 'EffectFlag');
 

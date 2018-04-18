@@ -1,10 +1,10 @@
 'use strict';
 
 const sprintf = require('sprintf-js').sprintf;
-const Combat = require('../../ranvier-combat/lib/Combat');
 
-module.exports = (srcPath) => {
+module.exports = (srcPath, app) => {
   const B = require(srcPath + 'Broadcast');
+  const Combat = app.Combat;
 
   return {
     aliases: [ 'stats' ],

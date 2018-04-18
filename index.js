@@ -5,6 +5,7 @@ const commander = require('commander');
 const wrap = require('wrap-ansi');
 const argv = require('optimist').argv;
 const path = require('path');
+const fs = require('fs');
 
 // Package.json for versioning
 const pkg = require('./package.json');
@@ -16,62 +17,55 @@ if (!semver.satisfies(process.version, pkg.engines.node)) {
   );
 }
 
+function loadSrc (dir) {
+  const src = {}
+  let files
+  try {
+    files = fs.readdirSync(dir);
+  }
+  catch (ex) {
+    console.log('dir: ' + dir)
+    console.error(ex)
+    process.exit()
+  }
+
+  for (const file of files) {
+    const filePath = path.join(dir, file);
+    const stats = fs.statSync(filePath);
+    const ext = path.extname(filePath)
+    const basename = path.basename(filePath);
+    const name = basename.substr(0, basename.length - ext.length)
+
+    if (stats.isFile()) {
+      if (ext != '.js' || file === '.' || file === '..') {
+        continue;
+      }
+      src[name] = require(filePath)
+    }
+    else if (stats.isDirectory()) {
+      src[name] = loadSrc(filePath)
+    }
+  }
+
+  return src
+}
+
 class Ranvier {
   constructor (options = {}) {
-    // State managers and factories
-    this.managers = [
-      'AccountManager',
-      'AreaManager',
-      'ChannelManager',
-      'ClassManager',
-      'CommandManager',
-      'EffectFactory',
-      'HelpManager',
-      'InputEventManager:EventManager',
-      'ItemBehaviorManager:BehaviorManager',
-      'ItemFactory',
-      'ItemManager',
-      'MobBehaviorManager:BehaviorManager',
-      'MobFactory',
-      'MobManager',
-      'PartyManager',
-      'PlayerManager',
-      'QuestFactory',
-      'QuestGoalManager',
-      'QuestRewardManager',
-      'RoomBehaviorManager:BehaviorManager',
-      'RoomManager',
-      'SkillManager',
-      'SpellManager:SkillManager',
-      'ServerEventManager:EventManager',
-      'GameServer'
-    ]
+    const src = {}
+    console.log('Object.keys(options)', Object.keys(options))
+    console.log('options.Damage.colin', options.Damage.colin)
+    console.log('Object.keys(Ranvier.base)', Object.keys(Ranvier.base))
 
-    this.managers = this.managers.map((name) => {
-      if (typeof(name) == 'string') {
-        let file
-        if (name.indexOf(':') > 0) {
-          const parts = name.split(':')
-          name = parts[0]
-          file = parts[1]
-        }
-        else {
-          file = name
-        }
-
-        const dir = options[name] || './src/' + file
-        console.log('dir',dir);
-
-        return {
-          name: name,
-          constructor: require(dir)
-        }
+    Object.keys(Ranvier.base).forEach((key) => {
+      if (options.hasOwnProperty(key)) {
+        console.log('KEY: ' + key)
+        this[key] = options[key]
       }
-      return name
+      else {
+        this[key] = Ranvier.base[key]
+      }
     })
-
-    // Wrapper for ranvier.json
-    this.Config = require('./src/Config')
 
     // cmdline options
     commander
@@ -113,6 +107,40 @@ class Ranvier {
   }
 
   /**
+   * Returns the constructor for a given value
+   * which can either be a string to require, or a constructor
+   *
+   * @param {String|Object} value
+   */
+  getConstructor (value) {
+    if (typeof(value) == 'object') {
+      return value
+    }
+    else if (typeof(value) == 'string') {
+      return require(value)
+    }
+
+    throw new Error('Could not load constructor from ' + value)
+  }
+
+  getConstructors (defaults, options) {
+    const constructors = {}
+
+    for (const [key, value] of this[prop]) {
+      const load = options[key] || value
+      constructors[key] = getConstructor(value)
+    }
+
+    return constructors
+  }
+
+  loadClassesInto (obj, constructors) {
+    for (const [key, value] of constructors) {
+      obj[key] = new value(this)
+    }
+  }
+
+  /**
    * Do the dirty work
    */
   init (restartServer) {
@@ -121,14 +149,41 @@ class Ranvier {
 
     this.GameState = {
       Config: this.Config, // All global server settings like default respawn time, save interval, port, what bundles to load, etc.
+    }
+
+    this.GameState = {
+      AccountManager: new this.AccountManager(),
+      AreaManager: new this.AreaManager(),
+      ChannelManager: new this.ChannelManager(),
+      ClassManager: new this.ClassManager(), // player class manager
+      CommandManager: new this.CommandManager(),
+      EffectFactory: new this.EffectFactory(),
+      HelpManager: new this.HelpManager(),
+      InputEventManager: new this.EventManager(),
+      ItemBehaviorManager: new this.BehaviorManager(),
+      ItemFactory: new this.ItemFactory(),
+      ItemManager: new this.ItemManager(),
+      MobBehaviorManager: new this.BehaviorManager(),
+      MobFactory: new this.MobFactory(),
+      MobManager: new this.MobManager(),
+      PartyManager: new this.PartyManager(),
+      PlayerManager: new this.PlayerManager(),
+      QuestFactory: new this.QuestFactory(),
+      QuestGoalManager: new this.QuestGoalManager(),
+      QuestRewardManager: new this.QuestRewardManager(),
+      RoomBehaviorManager: new this.BehaviorManager(),
+      RoomManager: new this.RoomManager(),
+      SkillManager: new this.SkillManager(),
+      SpellManager: new this.SkillManager(),
+      ServerEventManager: new this.EventManager(),
+      GameServer: new this.GameServer(),
+      Config: this.Config
     };
 
-    this.managers.forEach((manager) => {
-      this.GameState[manager.name] = new manager.constructor()
-    })
-
     // Setup bundlemanager
-    const BundleManager = new (require('./src/BundleManager'))(this);
+    const bundleManagerClass = require('./src/BundleManager')
+    console.log('typeof(this)', typeof(this))
+    const BundleManager = new bundleManagerClass(this);
     this.GameState.BundleManager = BundleManager;
     BundleManager.loadBundles();
     this.GameState.ServerEventManager.attach(this.GameState.GameServer);
@@ -159,10 +214,10 @@ class Ranvier {
   }
 }
 
-Ranvier.Data = require('./src/Data')
-Ranvier.Account = require('./src/Account')
-Ranvier.AccountManager = require('./src/AccountManager')
+//Load everything in the src folder
 
+const baseSrc = loadSrc(path.resolve(__dirname, 'src'))
+Ranvier.base = baseSrc
 
 module.exports = Ranvier
 

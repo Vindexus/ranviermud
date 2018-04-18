@@ -1,6 +1,5 @@
 'use strict';
 
-const Combat = require('./lib/Combat');
 const CombatErrors = require('./lib/CombatErrors');
 const LevelUtil = require('../ranvier-lib/lib/LevelUtil');
 const WebsocketStream = require('../ranvier-websocket/lib/WebsocketStream');
@@ -8,7 +7,8 @@ const WebsocketStream = require('../ranvier-websocket/lib/WebsocketStream');
 /**
  * Auto combat module
  */
-module.exports = (srcPath) => {
+module.exports = (srcPath, app) => {
+  const Combat = app.Combat
   const B = require(srcPath + 'Broadcast');
 
   return  {

@@ -1,13 +1,18 @@
 'use strict';
 
-const Combat = require('../../lib/Combat');
 
 /**
  * Example real-time combat behavior for NPCs that goes along with the player's player-combat.js
  * Have combat implemented in a behavior like this allows two NPCs with this behavior to fight without
  * the player having to be involved
  */
-module.exports = (srcPath) => {
+module.exports = (srcPath, app) => {
+  console.log('typeof(app)', typeof(app))
+  console.log('typeof(app.Combat)', typeof(app.Combat))
+  if(typeof app.Combat == 'undefined') {
+    throw new Error()
+  }
+  const Combat = app.Combat;
   return  {
     listeners: {
       /**

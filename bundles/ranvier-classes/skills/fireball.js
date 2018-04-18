@@ -3,9 +3,9 @@
 /**
  * Basic mage spell
  */
-module.exports = (srcPath) => {
+module.exports = (srcPath, app) => {
   const Broadcast = require(srcPath + 'Broadcast');
-  const Damage = require(srcPath + 'Damage');
+  const Damage = app.Damage;
   const SkillType = require(srcPath + 'SkillType');
 
   const damagePercent = 100;

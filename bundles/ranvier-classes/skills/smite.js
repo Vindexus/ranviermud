@@ -1,11 +1,10 @@
 'use strict';
 
-const Combat = require('../../ranvier-combat/lib/Combat');
-
-module.exports = (srcPath) => {
+module.exports = (srcPath, app) => {
+  const Combat = app.Combat;
   const Broadcast = require(srcPath + 'Broadcast');
   const SkillType = require(srcPath + 'SkillType');
-  const Damage = require(srcPath + 'Damage');
+  const Damage = app.Damage;
   const Heal = require(srcPath + 'Heal');
 
   // config placed here just for easy copy/paste of this skill later on

@@ -3,9 +3,9 @@
 /**
  * Implementation effect for a Rend damage over time skill
  */
-module.exports = srcPath => {
+module.exports = (srcPath, app) => {
   const Broadcast = require(srcPath + 'Broadcast');
-  const Damage = require(srcPath + 'Damage');
+  const Damage = app.Damage;
   const Flag = require(srcPath + 'EffectFlag');
 
   return {

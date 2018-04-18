@@ -1,0 +1,34 @@
+items
+  1:rustysword
+  2:sliceofcheese
+  3:woodenchest
+  4:scraps
+  5:trainingsword
+  6:leathervest
+  7:poitionhealth1
+  8:poitionstrength1
+  9:bladeofranvier
+  10:woodenshield
+npcs
+  1:rat
+  2:wiseoldman
+  3:puppy
+  4:trainingdummy
+  5:bossdummy
+  6:wallythewonderful
+quests
+  1:journeybegins
+  2:onecheeseplease
+  3:selfdefense101
+rooms
+  1:white
+  2:black
+  3:training1
+  4:training2
+  5:training3
+  6:training4
+  7:bosstraining
+  8:ancientwayshrine
+  9:wallys
+  10:context
+  11:locked

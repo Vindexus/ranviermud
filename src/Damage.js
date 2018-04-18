@@ -56,6 +56,7 @@ class Damage {
    * @return {number} Final damage amount
    */
   evaluate(target) {
+    console.log('evaluate old')
     let amount = this.amount;
 
     if (this.attacker) {
